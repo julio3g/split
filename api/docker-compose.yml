@@ -1,0 +1,37 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: split
+      POSTGRES_PASSWORD: split
+      POSTGRES_DB: split
+    ports:
+      - '5432:5432'
+    volumes:
+      - split_db_data:/var/lib/postgresql/data
+      - ./docker/init-test-db.sql:/docker-entrypoint-initdb.d/init-test-db.sql:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U split -d split']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgres://split:split@db:5432/split
+      PORT: 3333
+      JWT_SECRET: change-me-in-production
+      COOKIE_NAME: split_session
+      CORS_ORIGIN: http://localhost:5173
+    ports:
+      - '3333:3333'
+
+volumes:
+  split_db_data:
