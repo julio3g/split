@@ -24,7 +24,9 @@ function ProvidersPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="font-heading text-2xl font-semibold">Prestadores</h1>
-        <Button render={<Link to="/providers/new" />}>Novo prestador</Button>
+        <Button nativeButton={false} render={<Link to="/providers/new" />}>
+          Novo prestador
+        </Button>
       </div>
 
       <Input

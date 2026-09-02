@@ -122,7 +122,11 @@ function ServiceDetailPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Select value={service.status} onValueChange={handleStatusChange}>
+          <Select
+            value={service.status}
+            onValueChange={handleStatusChange}
+            items={SERVICE_STATUS_LABELS}
+          >
             <SelectTrigger className="w-44">
               <SelectValue />
             </SelectTrigger>

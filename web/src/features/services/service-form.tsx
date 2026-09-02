@@ -24,6 +24,7 @@ import {
 import { Textarea } from '@/components/ui/textarea'
 import type { Customer, Provider } from '@/types/api'
 import { calcServiceTotals } from './calc'
+import { X } from 'lucide-react'
 
 const NO_PROVIDER = '__none__'
 
@@ -103,7 +104,11 @@ export function ServiceForm({
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Cliente *</FormLabel>
-                <Select value={field.value} onValueChange={field.onChange}>
+                <Select
+                  value={field.value}
+                  onValueChange={field.onChange}
+                  items={Object.fromEntries(customers.map(c => [c.id, c.name]))}
+                >
                   <FormControl>
                     <SelectTrigger className="w-full">
                       <SelectValue placeholder="Selecione um cliente" />
@@ -132,6 +137,10 @@ export function ServiceForm({
                   onValueChange={value =>
                     field.onChange(value === NO_PROVIDER ? '' : value)
                   }
+                  items={{
+                    [NO_PROVIDER]: 'Sem prestador definido',
+                    ...Object.fromEntries(providers.map(p => [p.id, p.name])),
+                  }}
                 >
                   <FormControl>
                     <SelectTrigger className="w-full">
@@ -224,7 +233,7 @@ export function ServiceForm({
           {fields.map((field, index) => (
             <div
               key={field.id}
-              className="grid grid-cols-1 gap-2 rounded-md border p-3 sm:grid-cols-[1fr_repeat(3,7rem)_auto]"
+              className="grid grid-cols-1 gap-2 rounded-md items-end border p-3 sm:grid-cols-[1fr_repeat(3,7rem)_auto]"
             >
               <FormField
                 control={form.control}
@@ -280,7 +289,7 @@ export function ServiceForm({
                 name={`items.${index}.providerUnitPrice`}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="sm:sr-only">Repasse unit.</FormLabel>
+                    <FormLabel>Repasse unit.</FormLabel>
                     <FormControl>
                       <CurrencyInput
                         value={field.value}
@@ -294,12 +303,12 @@ export function ServiceForm({
               />
               <Button
                 type="button"
-                variant="ghost"
-                size="sm"
+                variant="outline"
+                size="icon"
                 disabled={fields.length === 1}
                 onClick={() => remove(index)}
               >
-                Remover
+                <X />
               </Button>
             </div>
           ))}

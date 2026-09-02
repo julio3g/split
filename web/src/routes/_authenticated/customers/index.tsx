@@ -24,7 +24,9 @@ function CustomersPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="font-heading text-2xl font-semibold">Clientes</h1>
-        <Button render={<Link to="/customers/new" />}>Novo cliente</Button>
+        <Button nativeButton={false} render={<Link to="/customers/new" />}>
+          Novo cliente
+        </Button>
       </div>
 
       <Input

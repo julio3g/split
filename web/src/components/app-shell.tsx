@@ -9,6 +9,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { useLogout, useMe } from '@/features/auth/hooks'
+import { WorkspaceSwitcher } from '@/features/workspaces/workspace-switcher'
 
 const NAV_ITEMS = [
   { to: '/', label: 'Dashboard' },
@@ -48,14 +49,17 @@ export function AppShell({ children }: { children: ReactNode }) {
               </Link>
             ))}
           </nav>
-          <DropdownMenu>
-            <DropdownMenuTrigger render={<Button variant="ghost" size="sm" />}>
-              {user?.username ?? '...'}
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem onClick={handleLogout}>Sair</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <div className="flex items-center gap-2">
+            <WorkspaceSwitcher />
+            <DropdownMenu>
+              <DropdownMenuTrigger render={<Button variant="ghost" size="sm" />}>
+                {user?.username ?? '...'}
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem onClick={handleLogout}>Sair</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
       </header>
       <main className="mx-auto max-w-6xl px-4 py-8">{children}</main>

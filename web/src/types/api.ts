@@ -1,7 +1,27 @@
+export type WorkspaceRole = 'owner' | 'member'
+
+export type WorkspaceSummary = {
+  id: string
+  name: string
+  role: WorkspaceRole
+}
+
+export type Workspace = WorkspaceSummary & {
+  inviteCode: string
+}
+
+export type WorkspaceMember = {
+  id: string
+  username: string
+  email: string
+  role: WorkspaceRole
+}
+
 export type User = {
   id: string
   username: string
   email: string
+  workspace: WorkspaceSummary
 }
 
 export type Customer = {

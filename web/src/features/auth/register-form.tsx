@@ -27,35 +27,51 @@ const registerSchema = z.object({
   username: z.string().min(2, 'Mínimo de 2 caracteres'),
   email: z.email('E-mail inválido'),
   password: z.string().min(6, 'Mínimo de 6 caracteres'),
+  workspaceName: z.string().optional(),
 })
 
 type RegisterFormData = z.infer<typeof registerSchema>
 
-export function RegisterForm() {
+type RegisterFormProps = {
+  inviteCode?: string
+}
+
+export function RegisterForm({ inviteCode }: RegisterFormProps) {
   const navigate = useNavigate()
   const register = useRegister()
 
   const form = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
-    defaultValues: { username: '', email: '', password: '' },
+    defaultValues: { username: '', email: '', password: '', workspaceName: '' },
   })
 
   function onSubmit(data: RegisterFormData) {
-    register.mutate(data, {
-      onSuccess: () => {
-        navigate({ to: '/' })
+    register.mutate(
+      {
+        ...data,
+        workspaceName: inviteCode ? undefined : data.workspaceName || undefined,
+        inviteCode,
       },
-      onError: error => {
-        toast.error(error.message)
-      },
-    })
+      {
+        onSuccess: () => {
+          navigate({ to: '/' })
+        },
+        onError: error => {
+          toast.error(error.message)
+        },
+      }
+    )
   }
 
   return (
     <Card className="w-full max-w-sm">
       <CardHeader>
         <CardTitle>Criar conta</CardTitle>
-        <CardDescription>Cadastre-se pra começar a usar o Split.</CardDescription>
+        <CardDescription>
+          {inviteCode
+            ? 'Você vai entrar na workspace do convite.'
+            : 'Cadastre-se pra começar a usar o Split.'}
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -103,6 +119,21 @@ export function RegisterForm() {
                 </FormItem>
               )}
             />
+            {!inviteCode && (
+              <FormField
+                control={form.control}
+                name="workspaceName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nome da workspace</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Opcional" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
             <Button
               type="submit"
               className="w-full"

@@ -65,7 +65,11 @@ export function EditServiceDetailsForm({
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Cliente *</FormLabel>
-                <Select value={field.value} onValueChange={field.onChange}>
+                <Select
+                  value={field.value}
+                  onValueChange={field.onChange}
+                  items={Object.fromEntries(customers.map(c => [c.id, c.name]))}
+                >
                   <FormControl>
                     <SelectTrigger className="w-full">
                       <SelectValue placeholder="Selecione um cliente" />
@@ -94,6 +98,10 @@ export function EditServiceDetailsForm({
                   onValueChange={value =>
                     field.onChange(value === NO_PROVIDER ? '' : value)
                   }
+                  items={{
+                    [NO_PROVIDER]: 'Sem prestador definido',
+                    ...Object.fromEntries(providers.map(p => [p.id, p.name])),
+                  }}
                 >
                   <FormControl>
                     <SelectTrigger className="w-full">

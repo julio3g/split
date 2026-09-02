@@ -26,7 +26,9 @@ function DashboardPage() {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <h1 className="font-heading text-2xl font-semibold">Dashboard</h1>
-        <Button render={<Link to="/services/new" />}>Novo serviço</Button>
+        <Button nativeButton={false} render={<Link to="/services/new" />}>
+          Novo serviço
+        </Button>
       </div>
 
       <SummaryCards services={services} />

@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
+import { MaskInput, type MaskPattern } from '@/components/ui/mask-input'
 
 export const customerFormSchema = z.object({
   name: z.string().min(1, 'Nome é obrigatório'),
@@ -29,6 +30,19 @@ type CustomerFormProps = {
   isPending?: boolean
   submitLabel?: string
 }
+
+export const phone8Pattern: MaskPattern = {
+  pattern: '(##) ####-####',
+  transform: value => value.replace(/\D/g, '').slice(0, 10),
+  validate: value => value.replace(/\D/g, '').length === 10,
+}
+
+export const phone9Pattern: MaskPattern = {
+  pattern: '(##) #####-####',
+  transform: value => value.replace(/\D/g, '').slice(0, 11),
+  validate: value => value.replace(/\D/g, '').length === 11,
+}
+
 
 export function CustomerForm({
   defaultValues,
@@ -49,7 +63,7 @@ export function CustomerForm({
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Nome *</FormLabel>
+              <FormLabel>Nome <span className='text-red-500'>*</span></FormLabel>
               <FormControl>
                 <Input {...field} />
               </FormControl>
@@ -60,15 +74,26 @@ export function CustomerForm({
         <FormField
           control={form.control}
           name="phone"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Telefone</FormLabel>
-              <FormControl>
-                <Input {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+          render={({ field }) => {
+            const rawValue = String(field.value ?? '')
+            const digits = rawValue.replace(/\D/g, '')
+            const isMobile = digits.length >= 3 ? digits[2] === '9' : false
+            const mask =
+              isMobile || digits.length > 10 ? phone9Pattern : phone8Pattern
+
+            return (
+              <FormItem>
+                <FormLabel htmlFor="phone">Telefone</FormLabel>
+                <MaskInput
+                  id="phone"
+                  mask={mask}
+                  value={rawValue}
+                  onValueChange={(_, unmasked) => field.onChange(unmasked ?? '')}
+                />
+                <FormMessage />
+              </FormItem>
+            )
+          }}
         />
         <FormField
           control={form.control}

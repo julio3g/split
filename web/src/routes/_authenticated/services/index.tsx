@@ -56,7 +56,9 @@ function ServicesPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="font-heading text-2xl font-semibold">Serviços</h1>
-        <Button render={<Link to="/services/new" />}>Novo serviço</Button>
+        <Button nativeButton={false} render={<Link to="/services/new" />}>
+          Novo serviço
+        </Button>
       </div>
 
       <div className="flex flex-wrap gap-3">
@@ -69,6 +71,7 @@ function ServicesPage() {
         <Select
           value={status}
           onValueChange={value => setStatus(value as ServiceStatus | typeof ALL)}
+          items={{ [ALL]: 'Todos os status', ...SERVICE_STATUS_LABELS }}
         >
           <SelectTrigger className="w-48">
             <SelectValue placeholder="Status" />
@@ -85,6 +88,10 @@ function ServicesPage() {
         <Select
           value={customerId}
           onValueChange={value => setCustomerId(value ?? ALL)}
+          items={{
+            [ALL]: 'Todos os clientes',
+            ...Object.fromEntries(customers.map(c => [c.id, c.name])),
+          }}
         >
           <SelectTrigger className="w-48">
             <SelectValue placeholder="Cliente" />

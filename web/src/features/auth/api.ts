@@ -10,6 +10,8 @@ export type RegisterInput = {
   username: string
   email: string
   password: string
+  inviteCode?: string
+  workspaceName?: string
 }
 
 export function getMe() {
