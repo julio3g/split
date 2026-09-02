@@ -1,9 +1,10 @@
+import { and, eq, sql } from 'drizzle-orm'
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 import { db } from '../../db/client'
-import { serviceItems, services } from '../../db/schema'
+import { customers, providers, serviceItems, services, workspaces } from '../../db/schema'
 import { withServiceTotals } from '../../lib/calc'
-import { ConflictError } from '../../lib/errors'
+import { ConflictError, NotFoundError } from '../../lib/errors'
 import { servicePublicSchema } from '../schemas'
 
 const serviceItemInputSchema = z.object({
@@ -38,11 +39,40 @@ export const createServiceRoute: FastifyPluginAsyncZod = async app => {
     },
     async (request, reply) => {
       const { items, ...serviceData } = request.body
+      const workspaceId = request.user.workspaceId
+
+      const customer = await db.query.customers.findFirst({
+        where: and(eq(customers.id, serviceData.customerId), eq(customers.workspaceId, workspaceId)),
+      })
+
+      if (!customer) {
+        throw new NotFoundError('Cliente não encontrado!')
+      }
+
+      if (serviceData.providerId) {
+        const provider = await db.query.providers.findFirst({
+          where: and(eq(providers.id, serviceData.providerId), eq(providers.workspaceId, workspaceId)),
+        })
+
+        if (!provider) {
+          throw new NotFoundError('Prestador não encontrado!')
+        }
+      }
 
       const created = await db.transaction(async tx => {
+        const [workspace] = await tx
+          .update(workspaces)
+          .set({ nextServiceNumber: sql`${workspaces.nextServiceNumber} + 1` })
+          .where(eq(workspaces.id, workspaceId))
+          .returning({ number: workspaces.nextServiceNumber })
+
+        if (!workspace) {
+          throw new ConflictError('Workspace não encontrada!')
+        }
+
         const [service] = await tx
           .insert(services)
-          .values(serviceData)
+          .values({ ...serviceData, workspaceId, number: workspace.number - 1 })
           .returning()
 
         if (!service) {

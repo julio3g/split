@@ -1,12 +1,16 @@
 import { relations } from 'drizzle-orm'
 import { pgTable, text, timestamp } from 'drizzle-orm/pg-core'
 import { services } from './services'
-import { generateId } from '@/lib/id'
+import { workspaces } from './workspaces'
+import { generateId } from '../../lib/id'
 
 export const providers = pgTable('providers', {
   id: text('id')
     .primaryKey()
     .$defaultFn(() => generateId('prv')),
+  workspaceId: text('workspace_id')
+    .notNull()
+    .references(() => workspaces.id, { onDelete: 'cascade' }),
   name: text('name').notNull(),
   phone: text('phone'),
   email: text('email'),

@@ -7,6 +7,8 @@ const EXPIRES_IN = '7d'
 export type SessionPayload = {
   sub: string
   email: string
+  workspaceId: string
+  workspaceRole: 'owner' | 'member'
 }
 
 export async function signSession(payload: SessionPayload) {

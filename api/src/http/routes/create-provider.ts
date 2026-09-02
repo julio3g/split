@@ -27,7 +27,7 @@ export const createProviderRoute: FastifyPluginAsyncZod = async app => {
     async (request, reply) => {
       const [provider] = await db
         .insert(providers)
-        .values(request.body)
+        .values({ ...request.body, workspaceId: request.user.workspaceId })
         .returning()
 
       if (!provider) {

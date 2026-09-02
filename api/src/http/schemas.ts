@@ -1,9 +1,29 @@
 import { z } from 'zod'
 
+export const workspaceRoleSchema = z.enum(['owner', 'member'])
+
+export const workspaceSummarySchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  role: workspaceRoleSchema,
+})
+
+export const workspacePublicSchema = workspaceSummarySchema.extend({
+  inviteCode: z.string(),
+})
+
+export const workspaceMemberPublicSchema = z.object({
+  id: z.string(),
+  username: z.string(),
+  email: z.string(),
+  role: workspaceRoleSchema,
+})
+
 export const userPublicSchema = z.object({
   id: z.string(),
   username: z.string(),
   email: z.string(),
+  workspace: workspaceSummarySchema,
 })
 
 export const customerPublicSchema = z.object({

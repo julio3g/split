@@ -7,8 +7,8 @@ import { buildApp } from '../app'
 describe('DELETE /customers/:id', () => {
   it('remove um cliente sem servicos vinculados', async () => {
     const app = buildApp()
-    const { cookieHeader } = await createTestUser()
-    const customer = await createTestCustomer()
+    const { cookieHeader, workspace } = await createTestUser()
+    const customer = await createTestCustomer(workspace.id)
 
     const response = await app.inject({
       method: 'DELETE',
@@ -21,10 +21,12 @@ describe('DELETE /customers/:id', () => {
 
   it('RB10: bloqueia exclusao de cliente com servico vinculado', async () => {
     const app = buildApp()
-    const { cookieHeader } = await createTestUser()
-    const customer = await createTestCustomer()
+    const { cookieHeader, workspace } = await createTestUser()
+    const customer = await createTestCustomer(workspace.id)
 
     await db.insert(services).values({
+      workspaceId: workspace.id,
+      number: 1,
       customerId: customer.id,
       title: 'Servico vinculado',
     })

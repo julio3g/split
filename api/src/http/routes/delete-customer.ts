@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm'
+import { and, eq } from 'drizzle-orm'
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 import { db } from '../../db/client'
@@ -21,7 +21,12 @@ export const deleteCustomerRoute: FastifyPluginAsyncZod = async app => {
       try {
         const [customer] = await db
           .delete(customers)
-          .where(eq(customers.id, request.params.id))
+          .where(
+            and(
+              eq(customers.id, request.params.id),
+              eq(customers.workspaceId, request.user.workspaceId)
+            )
+          )
           .returning()
 
         if (!customer) {

@@ -5,6 +5,7 @@ const prefixes = {
   cus: 'cus',
   prv: 'prv',
   svc: 'svc',
+  wsp: 'wsp',
 } as const
 
 interface GenerateIdOptions {

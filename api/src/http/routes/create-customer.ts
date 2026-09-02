@@ -27,7 +27,7 @@ export const createCustomerRoute: FastifyPluginAsyncZod = async app => {
     async (request, reply) => {
       const [customer] = await db
         .insert(customers)
-        .values(request.body)
+        .values({ ...request.body, workspaceId: request.user.workspaceId })
         .returning()
 
       if (!customer) {

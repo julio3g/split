@@ -2,7 +2,8 @@ import { eq } from 'drizzle-orm'
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod'
 import { db } from '../../db/client'
 import { users } from '../../db/schema'
-import { NotFoundError } from '../../lib/errors'
+import { NotFoundError, UnauthorizedError } from '../../lib/errors'
+import { getMembershipWithWorkspace } from '../../lib/workspace'
 import { userPublicSchema } from '../schemas'
 
 export const getAuthenticatedUserRoute: FastifyPluginAsyncZod = async app => {
@@ -27,10 +28,24 @@ export const getAuthenticatedUserRoute: FastifyPluginAsyncZod = async app => {
         throw new NotFoundError('Usuário não encontrado!')
       }
 
+      const membership = await getMembershipWithWorkspace(
+        user.id,
+        request.user.workspaceId
+      )
+
+      if (!membership) {
+        throw new UnauthorizedError('Sessão inválida ou expirada!')
+      }
+
       return {
         id: user.id,
         username: user.username,
         email: user.email,
+        workspace: {
+          id: membership.workspace.id,
+          name: membership.workspace.name,
+          role: membership.role,
+        },
       }
     }
   )

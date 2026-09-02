@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm'
+import { and, eq } from 'drizzle-orm'
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 import { db } from '../../db/client'
@@ -30,7 +30,12 @@ export const updateProviderRoute: FastifyPluginAsyncZod = async app => {
       const [provider] = await db
         .update(providers)
         .set({ ...request.body, updatedAt: new Date() })
-        .where(eq(providers.id, request.params.id))
+        .where(
+          and(
+            eq(providers.id, request.params.id),
+            eq(providers.workspaceId, request.user.workspaceId)
+          )
+        )
         .returning()
 
       if (!provider) {

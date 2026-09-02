@@ -11,6 +11,7 @@ import { generateId } from '../../lib/id'
 import { customers } from './customers'
 import { providers } from './providers'
 import { serviceItems } from './service-items'
+import { workspaces } from './workspaces'
 
 export const serviceStatusEnum = pgEnum('service_status', [
   'pending',
@@ -24,7 +25,10 @@ export const services = pgTable('services', {
   id: text('id')
     .primaryKey()
     .$defaultFn(() => generateId('svc')),
-  number: integer('number').notNull().generatedAlwaysAsIdentity(),
+  workspaceId: text('workspace_id')
+    .notNull()
+    .references(() => workspaces.id, { onDelete: 'cascade' }),
+  number: integer('number').notNull(),
   customerId: text('customer_id')
     .notNull()
     .references(() => customers.id, { onDelete: 'restrict' }),

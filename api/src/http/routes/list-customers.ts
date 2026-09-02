@@ -1,3 +1,4 @@
+import { eq } from 'drizzle-orm'
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 import { db } from '../../db/client'
@@ -17,8 +18,11 @@ export const listCustomersRoute: FastifyPluginAsyncZod = async app => {
         },
       },
     },
-    async () => {
-      return db.select().from(customers)
+    async request => {
+      return db
+        .select()
+        .from(customers)
+        .where(eq(customers.workspaceId, request.user.workspaceId))
     }
   )
 }

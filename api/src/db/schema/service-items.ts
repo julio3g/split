@@ -2,7 +2,7 @@ import { relations, sql } from 'drizzle-orm'
 import { numeric, pgTable, text, timestamp } from 'drizzle-orm/pg-core'
 
 import { services } from './services'
-import { generateId } from '@/lib/id'
+import { generateId } from '../../lib/id'
 
 export const serviceItems = pgTable('service_items', {
   id: text('id')

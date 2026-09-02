@@ -8,7 +8,7 @@ const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000
 export function setSessionCookie(reply: FastifyReply, token: string) {
   reply.setCookie(SESSION_COOKIE, token, {
     httpOnly: true,
-    sameSite: 'lax',
+    sameSite: env.NODE_ENV === 'production' ? 'none' : 'lax',
     secure: env.NODE_ENV === 'production',
     path: '/',
     maxAge: SEVEN_DAYS_MS / 1000,

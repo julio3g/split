@@ -6,7 +6,12 @@ import { UnauthorizedError } from '../../lib/errors'
 
 declare module 'fastify' {
   interface FastifyRequest {
-    user: { id: string; email: string }
+    user: {
+      id: string
+      email: string
+      workspaceId: string
+      workspaceRole: 'owner' | 'member'
+    }
   }
 }
 
@@ -18,8 +23,8 @@ async function authenticate(request: FastifyRequest, _reply: FastifyReply) {
   }
 
   try {
-    const { sub, email } = await verifySession(token)
-    request.user = { id: sub, email }
+    const { sub, email, workspaceId, workspaceRole } = await verifySession(token)
+    request.user = { id: sub, email, workspaceId, workspaceRole }
   } catch {
     throw new UnauthorizedError('Sessão inválida ou expirada!')
   }

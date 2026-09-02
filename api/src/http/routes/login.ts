@@ -7,6 +7,7 @@ import { signSession } from '../../lib/auth'
 import { setSessionCookie } from '../../lib/cookies'
 import { UnauthorizedError } from '../../lib/errors'
 import { compareValue } from '../../lib/hash'
+import { resolveActiveWorkspace } from '../../lib/workspace'
 import { userPublicSchema } from '../schemas'
 
 export const loginRoute: FastifyPluginAsyncZod = async app => {
@@ -45,13 +46,21 @@ export const loginRoute: FastifyPluginAsyncZod = async app => {
         throw new UnauthorizedError('Senha ou usuário inválidos!')
       }
 
-      const token = await signSession({ sub: user.id, email: user.email })
+      const workspace = await resolveActiveWorkspace(user.id, user.activeWorkspaceId)
+
+      const token = await signSession({
+        sub: user.id,
+        email: user.email,
+        workspaceId: workspace.id,
+        workspaceRole: workspace.role,
+      })
       setSessionCookie(reply, token)
 
       return {
         id: user.id,
         username: user.username,
         email: user.email,
+        workspace,
       }
     }
   )

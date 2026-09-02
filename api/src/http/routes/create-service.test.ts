@@ -8,8 +8,8 @@ import { buildApp } from '../app'
 describe('POST /services', () => {
   it('reproduz o exemplo do servico #105 do PRD (venda 250, repasse 149, margem 101)', async () => {
     const app = buildApp()
-    const { cookieHeader } = await createTestUser()
-    const customer = await createTestCustomer()
+    const { cookieHeader, workspace } = await createTestUser()
+    const customer = await createTestCustomer(workspace.id)
 
     const response = await app.inject({
       method: 'POST',
@@ -36,8 +36,8 @@ describe('POST /services', () => {
 
   it('rejeita servico sem itens (RB02)', async () => {
     const app = buildApp()
-    const { cookieHeader } = await createTestUser()
-    const customer = await createTestCustomer()
+    const { cookieHeader, workspace } = await createTestUser()
+    const customer = await createTestCustomer(workspace.id)
 
     const response = await app.inject({
       method: 'POST',
