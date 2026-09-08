@@ -1,5 +1,6 @@
 import fastifyCookie from '@fastify/cookie'
 import fastifyCors from '@fastify/cors'
+import fastifyHelmet from '@fastify/helmet'
 import fastifyRateLimit from '@fastify/rate-limit'
 import fastify from 'fastify'
 import {
@@ -40,13 +41,31 @@ import { updateWorkspaceRoute } from './routes/update-workspace'
 
 export function buildApp() {
   const app = fastify({
-    logger: env.NODE_ENV === 'development',
+    logger: {
+      level: env.NODE_ENV === 'development' ? 'debug' : 'info',
+      transport:
+        env.NODE_ENV === 'development'
+          ? { target: 'pino-pretty', options: { colorize: true } }
+          : undefined,
+      redact: {
+        paths: [
+          'req.headers.cookie',
+          'req.headers.authorization',
+          'res.headers["set-cookie"]',
+        ],
+        remove: true,
+      },
+    },
   }).withTypeProvider<ZodTypeProvider>()
 
   app.setValidatorCompiler(validatorCompiler)
   app.setSerializerCompiler(serializerCompiler)
   app.setErrorHandler(errorHandler)
 
+  app.register(fastifyHelmet, {
+    global: true,
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+  })
   app.register(fastifyCors, { origin: env.CORS_ORIGIN, credentials: true })
   app.register(fastifyCookie)
   app.register(fastifyRateLimit, {
